@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-require './rdparse'
-require './syntax_tree'
+require '~/awkward/rdparse'
+require '~/awkward/syntax_tree'
 
 class Awkward
 
