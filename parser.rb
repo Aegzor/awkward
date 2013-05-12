@@ -12,6 +12,7 @@ class Awkward
 #     Tokens
 ################################################################################
 
+      #ignore comments
       token(/#.*/)
 
       # string
@@ -26,7 +27,7 @@ class Awkward
       # single non-word characters
       token(/[^\w\s]/) { |t| t }
 
-      # ignore comments and whitespace
+      # ignore whitespace
       token(/[\t\ ]+/)
       token(/\n/)
 
@@ -361,7 +362,7 @@ class Awkward
         match(:a_expr, "-", :m_expr) do |lh, op, rh|
           ArithmeticExpr.new(lh, op, rh)
         end
-        match(:m_expr)
+        match(:m_expr) { |expr| expr }
       end
 
       rule :m_expr do
@@ -374,13 +375,13 @@ class Awkward
         match(:m_expr, "%", :arithmetic_primary) do |lh, op, rh|
           ArithmeticExpr.new(lh, op, rh)
         end
-        match(:arithmetic_primary)
+        match(:arithmetic_primary) { |primary| primary }
       end
 
       rule :concat_expr do
         match(:concat_expr, ",", :concat_primary) { |lh, _, rh| ConcatExpr.new(lh, rh) }
-        match(:concat_primary)
-        match("(", :concat_expr, ")")
+        match(:concat_primary) { |primary| primary }
+        match("(", :concat_expr, ")") { |_, expr, _| expr }
       end
 
 ################################################################################
@@ -401,7 +402,7 @@ class Awkward
         match("not", :comparison) do |op, comparison|
           NotTest.new(comparison, op)
         end
-        match(:comparison) # { |comparison| NotTest.new(comparison) }
+        match(:comparison)
         match("(", :and_or_test, ")")
       end
 
@@ -421,15 +422,15 @@ class Awkward
       end
 
       rule :seq_data_type do
-        match("list") { |data_type| data_type}#DataType.new(data_type) }
-        match("dict") { |data_type| data_type}#DataType.new(data_type) }
+        match("list") { |data_type| data_type}
+        match("dict") { |data_type| data_type}
       end
 
       rule :basic_data_type do
-        match("int") { |data_type| data_type}#DataType.new(data_type) }
-        match("float") { |data_type| data_type}#DataType.new(data_type) }
-        match("string") { |data_type| data_type}#DataType.new(data_type) }
-        match("bool") { |data_type| data_type}#DataType.new(data_type) }
+        match("int") { |data_type| data_type}
+        match("float") { |data_type| data_type}
+        match("string") { |data_type| data_type}
+        match("bool") { |data_type| data_type}
       end
 
 ################################################################################
@@ -523,9 +524,9 @@ class Awkward
 
       rule :arithmetic_primary do
         match("(", :a_expr, ")") { |_, expr, _| expr }
-        match(:reference)
-        match(:floatnumber)
-        match(:integer)
+        match(:reference) { |reference| reference }
+        match(:floatnumber) { |number| number }
+        match(:integer) { |number| number }
       end
       
       rule :identifier do
@@ -533,7 +534,7 @@ class Awkward
       end
 
       rule :reference do
-        match(:function_call)# { |value| FunctionCall.new(value) }
+        match(:function_call)
         match(:subscription) do |subscript|
           name = subscript[:name]
           index = subscript[:index]
