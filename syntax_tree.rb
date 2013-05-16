@@ -1,7 +1,17 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-@@scope = [{}]
+class Variable
+  attr_accessor :name, :value, :data_type
+  def initialize(name = "", value = nil, data_type = "")
+    @name = name
+    @value = value
+    @data_type = data_type
+  end
+end
+
+@@scope = [{"true" => Variable.new("true", "true", "bool"),
+             "false" => Variable.new("false", "false", "bool")}]
 @@functions = {}
 
 @@reserved_words = ["list",
@@ -35,15 +45,6 @@
                     "not",
                     "true",
                     "false"]
-
-class Variable
-  attr_accessor :name, :value, :data_type
-  def initialize
-    @name = ""
-    @value = nil
-    @data_type = ""
-  end
-end
 
 class Program
 
@@ -169,7 +170,11 @@ class DeclareVar
 
     new_var.name  = var_name
     new_var.data_type  = @data_type
-    new_var.value = nil
+    if @data_type == "list"
+      new_var.value = []
+    else
+      new_var.value = nil
+    end
 
     @@scope[0][var_name] = new_var
 
@@ -619,7 +624,7 @@ class ForConstruct
 
   def initialize(id, source, stmts)
     @id = id		# identifier
-    @source = source	# concat_expr or Range
+    @source = source	# concat_expr or Array
     @stmts = stmts	# list of Statements
   end
 

@@ -244,17 +244,17 @@ class Awkward
       end
 
       rule :for_stmt do
-        match("for", "(", :identifier, "in", :concat_expr,
-              ")", :enclosed_stmt_list, "end") do
-          |_, _, id, _, source, _, stmts, _|
-          ForConstruct.new(id, source, stmts)
-        end
-        match("for", "(", :identifier, "in", :integer, ":",
-              :integer, ")", :enclosed_stmt_list, "end") do
+        match("for", "(", :identifier, "in", :primary, ":",
+              :primary, ")", :enclosed_stmt_list, "end") do
           |_, _, id, _, first, _, second, _, stmts, _ |
 
           source = [first, second]
 
+          ForConstruct.new(id, source, stmts)
+        end
+        match("for", "(", :identifier, "in", :primary,
+              ")", :enclosed_stmt_list, "end") do
+          |_, _, id, _, source, _, stmts, _|
           ForConstruct.new(id, source, stmts)
         end
       end
@@ -499,8 +499,8 @@ class Awkward
       end
 
       rule :bool do
-        match("true") { |_| true}
-        match("false") { |_| false}
+        match("true") { |_| "true"}
+        match("false") { |_| "false"}
       end
 
       rule :digits do
